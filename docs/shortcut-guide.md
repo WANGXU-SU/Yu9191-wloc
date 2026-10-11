@@ -18,10 +18,10 @@
 ## 使用方法
 
 ### 1. 安装模块（一次性）
-订阅对应平台的模块并启用 MITM。
+从 [本仓库订阅地址](../README.md#订阅地址) 安装对应平台的模块并启用 MITM。原仓库失效后，停用或删除旧模块并重新订阅，不要同时启用两份 WLOC 模块。
 
 ### 2. 打开选点页面
-在 Safari 中打开公共选点页面（建议添加到主屏幕）:
+按下方部署说明创建你自己的 Worker/Pages，然后在 Safari 中打开部署得到的地址（建议添加到主屏幕）:
 ```
 https://你的worker域名/
 ```
@@ -40,13 +40,15 @@ https://你的worker域名/
 
 ---
 
-## 部署公共选点页面
+## 部署自己的选点页面
 
-无需任何绑定：
+在自己的 Cloudflare 账户部署，无需 KV 或数据库绑定：
 
 ```bash
-cd worker
+git clone https://github.com/WANGXU-SU/Yu9191-wloc.git
+cd Yu9191-wloc/worker
 npm install
+npx wrangler login
 npm run deploy
 ```
 
@@ -79,6 +81,27 @@ MITM 主机名: `gs-loc.apple.com, gs-loc-cn.apple.com`（已包含在模块中�
 4. **代理连接** — 当前网络走代理（Safari 请求会经过代理）
 
 ---
+
+## 备选：不部署页面，直接保存坐标
+
+确认新模块已启用且 MITM 证书已信任，在 Safari 打开以下地址。将占位符替换为实际的 **WGS84** 坐标数值；`lon` 是经度，`lat` 是纬度：
+
+```text
+https://gs-loc.apple.com/wloc-settings/save?lon=<经度>&lat=<纬度>
+```
+
+返回 `"success":true` 表示保存成功。查询或清除坐标可分别访问：
+
+```text
+https://gs-loc.apple.com/wloc-settings/save?action=query
+https://gs-loc.apple.com/wloc-settings/save?action=clear
+```
+
+这些地址由代理模块在设备上拦截，不是需要自行部署的网站。不要把域名换成 GitHub。清除后若模块参数中有自定义坐标，脚本仍会使用模块参数；恢复真实定位最直接的方法是停用模块。高版本 iOS 可能需要重启清除定位缓存。
+
+## 原版快捷指令迁移
+
+在快捷指令编辑器中，把原作者的地图链接解析接口改为你自己部署的 `https://<你的 Worker 域名>/api/parse`，保留原有查询参数。Apple 的设置和清除接口保持不变。没有部署 Worker/Pages 时，先使用上面的直接保存方式。
 
 ## 备选：手动编辑（BoxJS）
 
